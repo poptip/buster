@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/andybons/hipchat"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -110,13 +109,9 @@ func rockGiphy(q string, c *hipchat.Client) {
 		return
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-		return
-	}
 	giphyResp := &struct{ Data []GiphyGif }{}
-	if err := json.Unmarshal(body, giphyResp); err != nil {
+	dec := json.NewDecoder(resp.Body)
+	if err := dec.Decode(giphyResp); err != nil {
 		log.Println(err)
 		return
 	}
